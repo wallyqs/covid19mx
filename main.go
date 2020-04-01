@@ -26,7 +26,7 @@ const (
 
 const (
 	version     = "0.1.0"
-	releaseDate = "March 31, 2020"
+	releaseDate = "April 1st, 2020"
 )
 
 var (
@@ -240,7 +240,7 @@ func main() {
 	fs.BoolVar(&config.showHelp, "h", false, "Show help")
 	fs.BoolVar(&config.showHelp, "help", false, "Show help")
 	fs.BoolVar(&config.showVersion, "version", false, "Show version")
-	fs.StringVar(&config.exportFormat, "o", "", "Export format")
+	fs.StringVar(&config.exportFormat, "o", "", "Export format (options: json, csv, table)")
 	fs.StringVar(&config.source, "source", "", "Source")
 	fs.Parse(os.Args[1:])
 
@@ -258,16 +258,7 @@ func main() {
 		sdata *SinaveData
 		err   error
 	)
-
-	// Get latest sinave data by default.  Can also use a local checked
-	// version for the data or an explicit http endpoint.
-	if config.source == "" {
-		source, err := detectLatestDataSource()
-		if err != nil {
-			log.Fatal(err)
-		}
-		config.source = source
-	} else if strings.Contains(config.source, ".json") {
+	if strings.Contains(config.source, ".json") {
 		// Use a local file as the source
 		data, err := ioutil.ReadFile(config.source)
 		if err != nil {
@@ -284,10 +275,20 @@ func main() {
 		sdata = &SinaveData{
 			States: sd.States,
 		}
-	}
-	sdata, err = fetchData(config.source)
-	if err != nil {
-		log.Fatal(err)
+	} else {
+		// Get latest sinave data by default.  Can also use a local checked
+		// version for the data or an explicit http endpoint.
+		if config.source == "" {
+			source, err := detectLatestDataSource()
+			if err != nil {
+				log.Fatal(err)
+			}
+			config.source = source
+		}
+		sdata, err = fetchData(config.source)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	switch config.exportFormat {
@@ -295,6 +296,8 @@ func main() {
 		showCSV(sdata)
 	case "json":
 		showJSON(sdata)
+	case "table":
+		showTable(sdata)
 	default:
 		showTable(sdata)
 	}
