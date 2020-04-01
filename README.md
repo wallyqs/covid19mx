@@ -1,10 +1,21 @@
 # covid19mx - Data Tool
 
-Herramienta para obtener los datos actualizados sobre la situación de COVID19 en México en diversos formatos.
+Herramienta para obtener los datos actualizados sobre la situación de COVID19 en México.
 
 *Fuente de datos*: http://ncov.sinave.gob.mx/mapa.aspx
 
 ```sh
+$ covid19mx -h
+Usage: covid19mx [options...]
+
+  -h	Show help
+  -o string
+    	Export format (options: json, csv, table)
+  -source string
+    	Source
+  -version
+    	Show version
+      
 $ covid19mx
 |----------------------|-----------------|-----------------|-------------------|---------|
 | Estado               | Casos Positivos | Casos Negativos | Casos Sospechosos | Decesos |
