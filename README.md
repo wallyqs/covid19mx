@@ -1,4 +1,4 @@
-# covid19mx
+# covid19mx - Data Tool
 
 Herramienta para obtener los datos actualizados sobre la situación de COVID19 en México en diversos formatos (fuente: http://ncov.sinave.gob.mx/)
 
