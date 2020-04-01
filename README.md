@@ -1,9 +1,9 @@
 [![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Version](https://d25lcipzij17d.cloudfront.net/badge.svg?id=go&type=5&v=0.1.0)](https://github.com/wallyqs/covid19mx/releases/tag/v0.1.0)
 
-# covid19mx - Data Tool 🇲🇽
+# covid19mx - Data Tool
 
-Herramienta para obtener los datos actualizados sobre la situación de COVID19 en México. Para descargar busca el archivo para tu plataforma [aquí](https://github.com/wallyqs/covid19mx/releases).
+Herramienta para obtener los datos actualizados sobre la situación de COVID19 en México 🇲🇽. Para descargar busca el archivo para tu plataforma [aquí](https://github.com/wallyqs/covid19mx/releases).
 
 *Fuente de datos*: http://ncov.sinave.gob.mx/mapa.aspx
 
