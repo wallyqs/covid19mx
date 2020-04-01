@@ -1,0 +1,66 @@
+# This is an example goreleaser.yaml file with some sane defaults.
+# Make sure to check the documentation at http://goreleaser.com
+project_name: covid19mx
+
+release:
+  draft: true
+  github:
+    owner: wallyqs
+    name: covid19mx
+
+  name_template: 'Release {{.Tag}}'
+
+builds:
+- id: covid19mx
+  main: main.go
+  ldflags: -s -w
+  binary: covid19mx
+  env:
+    - CGO_ENABLED=0
+  goos:
+  - linux
+  - darwin
+  - windows
+  goarch:
+  - 386
+  - amd64
+  - arm
+  - arm64
+  goarm:
+  - 6
+  - 7
+  ignore:
+  - goos: darwin
+    goarch: 386
+
+archives:
+- wrap_in_directory: true
+  name_template: '{{ .ProjectName }}-v{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm
+    }}v{{ .Arm }}{{ end }}'
+  format: zip
+  files:
+  - LICENSE
+  - README.md
+    
+checksum:
+  name_template: '{{ .ProjectName }}-v{{ .Version }}-checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-snapshot"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^doc:'
+    - '^test:'
+
+github_urls:
+  download: https://github.com
+
+nfpms:
+- formats:
+    - deb
+  name_template: '{{ .ProjectName }}-v{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm
+    }}v{{ .Arm }}{{ end }}'
+  bindir: /usr/local/bin
+  description: A command line tool to fetch recent COVID19 data from Mexico
+  license: Apache 2.0
