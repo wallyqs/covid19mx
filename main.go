@@ -29,7 +29,7 @@ const (
 )
 
 const (
-	version     = "0.1.2"
+	version     = "0.1.4"
 	releaseDate = "April 2st, 2020"
 )
 
