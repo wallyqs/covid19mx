@@ -21,8 +21,8 @@ const (
 	sinaveURL = "http://ncov.sinave.gob.mx/mapa.aspx"
 
 	// Latest data will be usually found in one of the following urls.
-	sinaveURLA = "http://ncov.sinave.gob.mx/Mapa45.aspx/Grafica22"
-	sinaveURLB = "http://ncov.sinave.gob.mx/Mapa45.aspx/Grafica23"
+	sinaveURLA = "http://ncov.sinave.gob.mx/Mapa.aspx/Grafica22"
+	sinaveURLB = "http://ncov.sinave.gob.mx/Mapa.aspx/Grafica23"
 
 	// repoURL can be used to fetch previous days date.
 	repoURL = "https://wallyqs.github.io/covid19mx/data/"
