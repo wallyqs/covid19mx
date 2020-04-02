@@ -12,6 +12,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const (
@@ -22,11 +23,14 @@ const (
 	// Latest data will be usually found in one of the following urls.
 	sinaveURLA = "http://ncov.sinave.gob.mx/Mapa45.aspx/Grafica22"
 	sinaveURLB = "http://ncov.sinave.gob.mx/Mapa45.aspx/Grafica23"
+
+	// repoURL can be used to fetch previous days date.
+	repoURL = "https://wallyqs.github.io/covid19mx/data/"
 )
 
 const (
-	version     = "0.1.0"
-	releaseDate = "April 1st, 2020"
+	version     = "0.1.2"
+	releaseDate = "April 2st, 2020"
 )
 
 var (
@@ -168,6 +172,32 @@ func fetchData(endpoint string) (*SinaveData, error) {
 	return sdata, nil
 }
 
+func fetchPastData(endpoint string) (*SinaveData, error) {
+	hc := &http.Client{}
+	resp, err := hc.Get(endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	type s struct {
+		States []State `json:"states"`
+	}
+	var sd *s
+	err = json.Unmarshal(body, &sd)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	sdata := &SinaveData{
+		States: sd.States,
+	}
+	return sdata, nil
+}
+
 func detectLatestDataSource() (string, error) {
 	hc := &http.Client{}
 	resp, err := hc.Get(sinaveURL)
@@ -191,17 +221,60 @@ func detectLatestDataSource() (string, error) {
 }
 
 func showTable(sdata *SinaveData) {
-	log.Println("|----------------------|-----------------|-----------------|-------------------|---------|")
-	log.Println("| Estado               | Casos Positivos | Casos Negativos | Casos Sospechosos | Decesos |")
-	log.Println("|----------------------|-----------------|-----------------|-------------------|---------|")
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|")
+	fmt.Println("| Estado               | Casos Positivos | Casos Negativos | Casos Sospechosos | Decesos |")
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|")
 	for _, state := range sdata.States {
-		log.Printf("| %-20s | %-15d | %-15d | %-17d | %-7d |\n",
+		fmt.Printf("| %-20s | %-15d | %-15d | %-17d | %-7d |\n",
 			state.Name, state.PositiveCases, state.NegativeCases, state.SuspectCases, state.Deaths)
 	}
-	log.Println("|----------------------|-----------------|-----------------|-------------------|---------|")
-	log.Printf("| %-20s | %-15d | %-15d | %-17d | %-7d |\n",
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|")
+	fmt.Printf("| %-20s | %-15d | %-15d | %-17d | %-7d |\n",
 		"TOTAL", sdata.TotalPositiveCases(), sdata.TotalNegativeCases(), sdata.TotalSuspectCases(), sdata.TotalDeaths())
-	log.Println("|----------------------|-----------------|-----------------|-------------------|---------|")
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|")
+}
+
+func showTableDiff(sdata, pdata *SinaveData) {
+	pmap := make(map[string]State)
+	for _, state := range pdata.States {
+		pmap[state.Name] = state
+	}
+
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|-----------|")
+	fmt.Println("| Estado               | Casos Positivos | Casos Negativos | Casos Sospechosos | Decesos   |")
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|-----------|")
+	for _, state := range sdata.States {
+		pstate := pmap[state.Name]
+		fmt.Printf("| %-20s | %-15s | %-15s | %-17s | %-7s |\n",
+			state.Name,
+			fmt.Sprintf("%-5d (%d)", state.PositiveCases-pstate.PositiveCases, state.PositiveCases),
+			fmt.Sprintf("%-5d (%d)", state.NegativeCases-pstate.NegativeCases, state.NegativeCases),
+			fmt.Sprintf("%-5d (%d)", state.SuspectCases-pstate.SuspectCases, state.SuspectCases),
+			fmt.Sprintf("%-5d (%d)", state.Deaths-pstate.Deaths, state.Deaths),
+		)
+	}
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|-----------|")
+	fmt.Printf("| %-20s | %-15d | %-15d | %-17d | %-9d |\n",
+		"TOTAL",
+		sdata.TotalPositiveCases()-pdata.TotalPositiveCases(),
+		sdata.TotalNegativeCases()-pdata.TotalNegativeCases(),
+		sdata.TotalSuspectCases()-pdata.TotalNegativeCases(),
+		sdata.TotalDeaths()-pdata.TotalDeaths(),
+	)
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|-----------|")
+}
+
+func showTableAwkFriendly(sdata *SinaveData) {
+	for _, state := range sdata.States {
+		var name string
+		if state.Name == "Ciudad de México" {
+			name = "CDMX"
+		} else {
+			name = strings.Join(strings.Fields(state.Name), "1d")
+		}
+		fmt.Printf("%-20s\t%-15d\t%-15d\t%-17d\t%-7d\n",
+			name, state.PositiveCases, state.NegativeCases, state.SuspectCases, state.Deaths)
+	}
 }
 
 func showJSON(sdata *SinaveData) {
@@ -225,6 +298,7 @@ type CliConfig struct {
 	showHelp     bool
 	exportFormat string
 	source       string
+	since        string
 }
 
 func main() {
@@ -240,8 +314,10 @@ func main() {
 	fs.BoolVar(&config.showHelp, "h", false, "Show help")
 	fs.BoolVar(&config.showHelp, "help", false, "Show help")
 	fs.BoolVar(&config.showVersion, "version", false, "Show version")
+	fs.BoolVar(&config.showVersion, "v", false, "Show version")
 	fs.StringVar(&config.exportFormat, "o", "", "Export format (options: json, csv, table)")
-	fs.StringVar(&config.source, "source", "", "Source")
+	fs.StringVar(&config.source, "source", "", "Source of the data")
+	fs.StringVar(&config.since, "since", "", "Date against which to compare the data")
 	fs.Parse(os.Args[1:])
 
 	switch {
@@ -291,14 +367,31 @@ func main() {
 		}
 	}
 
-	switch config.exportFormat {
-	case "csv":
-		showCSV(sdata)
-	case "json":
-		showJSON(sdata)
-	case "table":
-		showTable(sdata)
-	default:
-		showTable(sdata)
+	if config.since != "" {
+		var date time.Time
+		switch config.since {
+		case "-1d", "1d", "yesterday":
+			date = time.Now().AddDate(0, 0, -1)
+		case "-2d", "2d", "2 days ago":
+			date = time.Now().AddDate(0, 0, -2)
+		}
+		pdata, err := fetchPastData(repoURL + date.Format("2006-01-02") + ".json")
+		if err != nil {
+			log.Fatal(err)
+		}
+		showTableDiff(sdata, pdata)
+	} else {
+		switch config.exportFormat {
+		case "csv":
+			showCSV(sdata)
+		case "json":
+			showJSON(sdata)
+		case "table":
+			showTable(sdata)
+		case "awk":
+			showTableAwkFriendly(sdata)
+		default:
+			showTable(sdata)
+		}
 	}
 }
