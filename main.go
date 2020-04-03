@@ -18,19 +18,19 @@ import (
 const (
 	// Used to detect where the actual data is being located, this
 	// seems to change day to day.
-	sinaveURL = "http://ncov.sinave.gob.mx/mapa.aspx"
+	sinaveURL = "https://ncov.sinave.gob.mx/mapa.aspx"
 
 	// Latest data will be usually found in one of the following urls.
-	sinaveURLA = "http://ncov.sinave.gob.mx/Mapa.aspx/Grafica22"
-	sinaveURLB = "http://ncov.sinave.gob.mx/Mapa.aspx/Grafica23"
+	sinaveURLA = "https://ncov.sinave.gob.mx/Mapa.aspx/Grafica22"
+	sinaveURLB = "https://ncov.sinave.gob.mx/Mapa.aspx/Grafica23"
 
 	// repoURL can be used to fetch previous days date.
 	repoURL = "https://wallyqs.github.io/covid19mx/data/"
 )
 
 const (
-	version     = "0.1.4"
-	releaseDate = "April 2st, 2020"
+	version     = "0.1.6"
+	releaseDate = "April 3st, 2020"
 )
 
 var (
@@ -65,7 +65,6 @@ func (s *SinaveData) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		return err
 	}
-
 	data := all["d"].(string)
 	var states [][]interface{}
 	err = json.Unmarshal([]byte(data), &states)
@@ -163,6 +162,9 @@ func fetchData(endpoint string) (*SinaveData, error) {
 	if err != nil {
 		return nil, err
 	}
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("Error: %s", body)
+	}
 
 	var sdata *SinaveData
 	err = json.Unmarshal(body, &sdata)
@@ -183,6 +185,10 @@ func fetchPastData(endpoint string) (*SinaveData, error) {
 	if err != nil {
 		return nil, err
 	}
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("Error: %s", body)
+	}
+
 	type s struct {
 		States []State `json:"states"`
 	}
@@ -208,6 +214,9 @@ func detectLatestDataSource() (string, error) {
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
+	}
+	if resp.StatusCode != 200 {
+		return "", fmt.Errorf("Error: %s", body)
 	}
 
 	// ...
