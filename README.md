@@ -5,7 +5,7 @@
 
 Herramienta para obtener los datos actualizados sobre la situación de COVID19 en México 🇲🇽. Para descargar busca el archivo para tu plataforma [aquí](https://github.com/wallyqs/covid19mx/releases).
 
-*Fuente de datos*: http://ncov.sinave.gob.mx/mapa.aspx
+*Fuente de datos*: https://ncov.sinave.gob.mx/mapa.aspx
 
 ```sh
 $ covid19mx -h
