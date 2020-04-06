@@ -29,8 +29,8 @@ const (
 )
 
 const (
-	version     = "0.1.6"
-	releaseDate = "April 3st, 2020"
+	version     = "0.2.0"
+	releaseDate = "April 6th, 2020"
 )
 
 var (
@@ -146,6 +146,10 @@ func (sdata *SinaveData) TotalDeaths() int {
 	return sdata.td
 }
 
+func (sdata *SinaveData) TestPositivityRate() float64 {
+	return float64(sdata.TotalPositiveCases()) / float64((sdata.TotalPositiveCases() + sdata.TotalNegativeCases()))
+}
+
 func fetchData(endpoint string) (*SinaveData, error) {
 	hc := &http.Client{}
 	req, err := http.NewRequest("POST", endpoint, nil)
@@ -230,17 +234,18 @@ func detectLatestDataSource() (string, error) {
 }
 
 func showTable(sdata *SinaveData) {
-	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|")
-	fmt.Println("| Estado               | Casos Positivos | Casos Negativos | Casos Sospechosos | Decesos |")
-	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|")
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|-------------|")
+	fmt.Println("| Estado               | Casos Positivos | Casos Negativos | Casos Sospechosos | Decesos | Positividad |")
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|-------------|")
 	for _, state := range sdata.States {
-		fmt.Printf("| %-20s | %-15d | %-15d | %-17d | %-7d |\n",
-			state.Name, state.PositiveCases, state.NegativeCases, state.SuspectCases, state.Deaths)
+		testPositivityRate := float64(state.PositiveCases) / (float64(state.PositiveCases) + float64(state.NegativeCases))
+		fmt.Printf("| %-20s | %-15d | %-15d | %-17d | %-7d | %-8.4f    |\n",
+			state.Name, state.PositiveCases, state.NegativeCases, state.SuspectCases, state.Deaths, testPositivityRate)
 	}
-	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|")
-	fmt.Printf("| %-20s | %-15d | %-15d | %-17d | %-7d |\n",
-		"TOTAL", sdata.TotalPositiveCases(), sdata.TotalNegativeCases(), sdata.TotalSuspectCases(), sdata.TotalDeaths())
-	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|")
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|-------------|")
+	fmt.Printf("| %-20s | %-15d | %-15d | %-17d | %-7d | %-8.4f    |\n",
+		"TOTAL", sdata.TotalPositiveCases(), sdata.TotalNegativeCases(), sdata.TotalSuspectCases(), sdata.TotalDeaths(), sdata.TestPositivityRate())
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|-------------|")
 }
 
 func showTableDiff(sdata, pdata *SinaveData) {
