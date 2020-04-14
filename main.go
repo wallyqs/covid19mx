@@ -29,8 +29,8 @@ const (
 )
 
 const (
-	version     = "0.2.0"
-	releaseDate = "April 6th, 2020"
+	version     = "0.2.2"
+	releaseDate = "April 13th, 2020"
 )
 
 var (
@@ -77,6 +77,10 @@ func (s *SinaveData) UnmarshalJSON(b []byte) error {
 		// e.g.
 		// [1 Aguascalientes 1353758.409 01 24 243 74 0]
 		name := entry[1].(string)
+		if name == "NACIONAL" {
+			continue
+		}
+
 		pos, err := strconv.Atoi(entry[4].(string))
 		if err != nil {
 			return err
@@ -238,6 +242,9 @@ func showTable(sdata *SinaveData) {
 	fmt.Println("| Estado               | Casos Positivos | Casos Negativos | Casos Sospechosos | Decesos | Positividad |")
 	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|-------------|")
 	for _, state := range sdata.States {
+		if state.Name == "NACIONAL" {
+			continue
+		}
 		testPositivityRate := float64(state.PositiveCases) / (float64(state.PositiveCases) + float64(state.NegativeCases))
 		fmt.Printf("| %-20s | %-15d | %-15d | %-17d | %-7d | %-8.4f    |\n",
 			state.Name, state.PositiveCases, state.NegativeCases, state.SuspectCases, state.Deaths, testPositivityRate)
@@ -251,6 +258,9 @@ func showTable(sdata *SinaveData) {
 func showTableDiff(sdata, pdata *SinaveData) {
 	pmap := make(map[string]State)
 	for _, state := range pdata.States {
+		if state.Name == "NACIONAL" {
+			continue
+		}
 		pmap[state.Name] = state
 	}
 
@@ -280,6 +290,9 @@ func showTableDiff(sdata, pdata *SinaveData) {
 
 func showTableAwkFriendly(sdata *SinaveData) {
 	for _, state := range sdata.States {
+		if state.Name == "NACIONAL" {
+			continue
+		}
 		var name string
 		if state.Name == "Ciudad de México" {
 			name = "CDMX"
@@ -302,6 +315,9 @@ func showJSON(sdata *SinaveData) {
 func showCSV(sdata *SinaveData) {
 	fmt.Println("\"Estado\"               , \"Casos Positivos\" , \"Casos Negativos\" , \"Casos Sospechosos\" , \"Decesos\"")
 	for _, state := range sdata.States {
+		if state.Name == "NACIONAL" {
+			continue
+		}
 		fmt.Printf("  %-20s , %-15d , %-15d , %-17d , %-7d \n",
 			state.Name, state.PositiveCases, state.NegativeCases, state.SuspectCases, state.Deaths)
 	}
