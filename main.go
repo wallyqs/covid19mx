@@ -18,19 +18,19 @@ import (
 const (
 	// Used to detect where the actual data is being located, this
 	// seems to change day to day.
-	sinaveURL = "https://ncov.sinave.gob.mx/mapa.aspx"
+	sinaveURL = "https://covid19.sinave.gob.mx/mapa.aspx"
 
 	// Latest data will be usually found in one of the following urls.
-	sinaveURLA = "https://ncov.sinave.gob.mx/Mapa.aspx/Grafica22"
-	sinaveURLB = "https://ncov.sinave.gob.mx/Mapa.aspx/Grafica23"
+	sinaveURLA = "https://covid19.sinave.gob.mx/Mapa.aspx/Grafica22"
+	sinaveURLB = "https://covid19.sinave.gob.mx/Mapa.aspx/Grafica23"
 
 	// repoURL can be used to fetch previous days date.
 	repoURL = "https://wallyqs.github.io/covid19mx/data/"
 )
 
 const (
-	version     = "0.2.2"
-	releaseDate = "April 13th, 2020"
+	version     = "0.2.4"
+	releaseDate = "April 14th, 2020"
 )
 
 var (
