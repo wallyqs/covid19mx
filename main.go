@@ -29,8 +29,8 @@ const (
 )
 
 const (
-	version     = "0.2.4"
-	releaseDate = "April 14th, 2020"
+	version     = "0.3.0"
+	releaseDate = "April 19th, 2020"
 )
 
 var (
@@ -264,12 +264,12 @@ func showTableDiff(sdata, pdata *SinaveData) {
 		pmap[state.Name] = state
 	}
 
-	fmt.Println("|----------------------|-----------------|-----------------|-------------------|-----------|")
-	fmt.Println("| Estado               | Casos Positivos | Casos Negativos | Casos Sospechosos | Decesos   |")
-	fmt.Println("|----------------------|-----------------|-----------------|-------------------|-----------|")
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|-------------|")
+	fmt.Println("| Estado               | Casos Positivos | Casos Negativos | Casos Sospechosos | Decesos     |")
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|-------------|")
 	for _, state := range sdata.States {
 		pstate := pmap[state.Name]
-		fmt.Printf("| %-20s | %-15s | %-15s | %-17s | %-7s |\n",
+		fmt.Printf("| %-20s | %-15s | %-15s | %-17s | %-11s |\n",
 			state.Name,
 			fmt.Sprintf("%-5d (%d)", state.PositiveCases-pstate.PositiveCases, state.PositiveCases),
 			fmt.Sprintf("%-5d (%d)", state.NegativeCases-pstate.NegativeCases, state.NegativeCases),
@@ -277,15 +277,15 @@ func showTableDiff(sdata, pdata *SinaveData) {
 			fmt.Sprintf("%-5d (%d)", state.Deaths-pstate.Deaths, state.Deaths),
 		)
 	}
-	fmt.Println("|----------------------|-----------------|-----------------|-------------------|-----------|")
-	fmt.Printf("| %-20s | %-15d | %-15d | %-17d | %-9d |\n",
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|-------------|")
+	fmt.Printf("| %-20s | %-15d | %-15d | %-17d | %-11d |\n",
 		"TOTAL",
 		sdata.TotalPositiveCases()-pdata.TotalPositiveCases(),
 		sdata.TotalNegativeCases()-pdata.TotalNegativeCases(),
 		sdata.TotalSuspectCases()-pdata.TotalNegativeCases(),
 		sdata.TotalDeaths()-pdata.TotalDeaths(),
 	)
-	fmt.Println("|----------------------|-----------------|-----------------|-------------------|-----------|")
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|-------------|")
 }
 
 func showTableAwkFriendly(sdata *SinaveData) {
@@ -404,6 +404,12 @@ func main() {
 			date = time.Now().AddDate(0, 0, -1)
 		case "-2d", "2d", "2 days ago":
 			date = time.Now().AddDate(0, 0, -2)
+		default:
+			days, err := strconv.Atoi(config.since)
+			if err != nil {
+				log.Fatal(err)
+			}
+			date = time.Now().AddDate(0, 0, days*-1)
 		}
 		pdata, err := fetchPastData(repoURL + date.Format("2006-01-02") + ".json")
 		if err != nil {
