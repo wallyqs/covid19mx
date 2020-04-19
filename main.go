@@ -26,6 +26,13 @@ const (
 
 	// repoURL can be used to fetch previous days date.
 	repoURL = "https://wallyqs.github.io/covid19mx/data/"
+
+	// attackRateURL is the url with the info with the
+	//
+	// See: https://en.wikipedia.org/wiki/Attack_rate
+	//      https://es.wikipedia.org/wiki/Incidencia
+	//
+	attackRateURL = "https://covid19.sinave.gob.mx/MapaTasas.aspx/Grafica22"
 )
 
 const (
@@ -42,11 +49,12 @@ func init() {
 }
 
 type State struct {
-	Name          string `json:"name"`
-	PositiveCases int    `json:"positive"`
-	NegativeCases int    `json:"negative"`
-	SuspectCases  int    `json:"suspect"`
-	Deaths        int    `json:"deaths"`
+	Name          string  `json:"name"`
+	PositiveCases int     `json:"positive"`
+	NegativeCases int     `json:"negative"`
+	SuspectCases  int     `json:"suspect"`
+	Deaths        int     `json:"deaths"`
+	AttackRate    float64 `json:"attack_rate"`
 }
 
 type SinaveData struct {
@@ -55,6 +63,9 @@ type SinaveData struct {
 	tnc    int
 	tsc    int
 	td     int
+
+	// ar is the attackRate
+	ar float64
 }
 
 func (s *SinaveData) UnmarshalJSON(b []byte) error {
@@ -97,12 +108,17 @@ func (s *SinaveData) UnmarshalJSON(b []byte) error {
 		if err != nil {
 			return err
 		}
+		attackRate, err := strconv.ParseFloat(entry[8].(string), 64)
+		if err != nil {
+			return err
+		}
 		state := State{
 			Name:          name,
 			PositiveCases: pos,
 			NegativeCases: neg,
 			SuspectCases:  susp,
 			Deaths:        deaths,
+			AttackRate:    attackRate,
 		}
 		s.States = append(s.States, state)
 	}
@@ -238,21 +254,37 @@ func detectLatestDataSource() (string, error) {
 }
 
 func showTable(sdata *SinaveData) {
-	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|-------------|")
-	fmt.Println("| Estado               | Casos Positivos | Casos Negativos | Casos Sospechosos | Decesos | Positividad |")
-	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|-------------|")
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|-------------|------------|")
+	fmt.Println("| Estado               | Casos Positivos | Casos Negativos | Casos Sospechosos | Decesos | Positividad | Incidencia |")
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|-------------|------------|")
+	var totalAttackRate float64
 	for _, state := range sdata.States {
 		if state.Name == "NACIONAL" {
+			totalAttackRate = state.AttackRate
 			continue
 		}
 		testPositivityRate := float64(state.PositiveCases) / (float64(state.PositiveCases) + float64(state.NegativeCases))
-		fmt.Printf("| %-20s | %-15d | %-15d | %-17d | %-7d | %-8.4f    |\n",
-			state.Name, state.PositiveCases, state.NegativeCases, state.SuspectCases, state.Deaths, testPositivityRate)
+		fmt.Printf("| %-20s | %-15d | %-15d | %-17d | %-7d | %-8.4f    | %-8.2f   |\n",
+			state.Name,
+			state.PositiveCases,
+			state.NegativeCases,
+			state.SuspectCases,
+			state.Deaths,
+			testPositivityRate,
+			state.AttackRate,
+		)
 	}
-	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|-------------|")
-	fmt.Printf("| %-20s | %-15d | %-15d | %-17d | %-7d | %-8.4f    |\n",
-		"TOTAL", sdata.TotalPositiveCases(), sdata.TotalNegativeCases(), sdata.TotalSuspectCases(), sdata.TotalDeaths(), sdata.TestPositivityRate())
-	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|-------------|")
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|-------------|------------|")
+	fmt.Printf("| %-20s | %-15d | %-15d | %-17d | %-7d | %-8.4f    | %-8.4f   |\n",
+		"TOTAL",
+		sdata.TotalPositiveCases(),
+		sdata.TotalNegativeCases(),
+		sdata.TotalSuspectCases(),
+		sdata.TotalDeaths(),
+		sdata.TestPositivityRate(),
+		totalAttackRate,
+	)
+	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|-------------|------------|")
 }
 
 func showTableDiff(sdata, pdata *SinaveData) {
@@ -385,11 +417,7 @@ func main() {
 		// Get latest sinave data by default.  Can also use a local checked
 		// version for the data or an explicit http endpoint.
 		if config.source == "" {
-			source, err := detectLatestDataSource()
-			if err != nil {
-				log.Fatal(err)
-			}
-			config.source = source
+			config.source = attackRateURL
 		}
 		sdata, err = fetchData(config.source)
 		if err != nil {
