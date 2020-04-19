@@ -1,0 +1,228 @@
+{
+  "states": [
+    {
+      "name": "Aguascalientes",
+      "positive": 77,
+      "negative": 842,
+      "suspect": 82,
+      "deaths": 2
+    },
+    {
+      "name": "Baja California",
+      "positive": 610,
+      "negative": 869,
+      "suspect": 841,
+      "deaths": 68
+    },
+    {
+      "name": "Baja California Sur",
+      "positive": 173,
+      "negative": 523,
+      "suspect": 313,
+      "deaths": 6
+    },
+    {
+      "name": "Campeche",
+      "positive": 56,
+      "negative": 134,
+      "suspect": 28,
+      "deaths": 3
+    },
+    {
+      "name": "Coahuila",
+      "positive": 232,
+      "negative": 1245,
+      "suspect": 970,
+      "deaths": 18
+    },
+    {
+      "name": "Colima",
+      "positive": 10,
+      "negative": 106,
+      "suspect": 21,
+      "deaths": 2
+    },
+    {
+      "name": "Chiapas",
+      "positive": 62,
+      "negative": 292,
+      "suspect": 50,
+      "deaths": 3
+    },
+    {
+      "name": "Chihuahua",
+      "positive": 131,
+      "negative": 315,
+      "suspect": 220,
+      "deaths": 31
+    },
+    {
+      "name": "Ciudad de México",
+      "positive": 2299,
+      "negative": 6127,
+      "suspect": 2369,
+      "deaths": 178
+    },
+    {
+      "name": "Durango",
+      "positive": 19,
+      "negative": 291,
+      "suspect": 98,
+      "deaths": 4
+    },
+    {
+      "name": "Guanajuato",
+      "positive": 116,
+      "negative": 1753,
+      "suspect": 343,
+      "deaths": 9
+    },
+    {
+      "name": "Guerrero",
+      "positive": 110,
+      "negative": 343,
+      "suspect": 123,
+      "deaths": 11
+    },
+    {
+      "name": "Hidalgo",
+      "positive": 75,
+      "negative": 401,
+      "suspect": 45,
+      "deaths": 13
+    },
+    {
+      "name": "Jalisco",
+      "positive": 196,
+      "negative": 2666,
+      "suspect": 547,
+      "deaths": 13
+    },
+    {
+      "name": "México",
+      "positive": 786,
+      "negative": 2020,
+      "suspect": 1289,
+      "deaths": 52
+    },
+    {
+      "name": "Michoacán",
+      "positive": 107,
+      "negative": 645,
+      "suspect": 249,
+      "deaths": 16
+    },
+    {
+      "name": "Morelos",
+      "positive": 77,
+      "negative": 333,
+      "suspect": 60,
+      "deaths": 11
+    },
+    {
+      "name": "Nayarit",
+      "positive": 33,
+      "negative": 186,
+      "suspect": 35,
+      "deaths": 5
+    },
+    {
+      "name": "Nuevo León",
+      "positive": 172,
+      "negative": 2200,
+      "suspect": 2184,
+      "deaths": 6
+    },
+    {
+      "name": "Oaxaca",
+      "positive": 62,
+      "negative": 367,
+      "suspect": 61,
+      "deaths": 6
+    },
+    {
+      "name": "Puebla",
+      "positive": 330,
+      "negative": 885,
+      "suspect": 344,
+      "deaths": 40
+    },
+    {
+      "name": "Queretaro",
+      "positive": 79,
+      "negative": 462,
+      "suspect": 81,
+      "deaths": 6
+    },
+    {
+      "name": "Quintana Roo",
+      "positive": 315,
+      "negative": 450,
+      "suspect": 188,
+      "deaths": 31
+    },
+    {
+      "name": "San Luis Potosí",
+      "positive": 59,
+      "negative": 949,
+      "suspect": 102,
+      "deaths": 4
+    },
+    {
+      "name": "Sinaloa",
+      "positive": 413,
+      "negative": 818,
+      "suspect": 285,
+      "deaths": 45
+    },
+    {
+      "name": "Sonora",
+      "positive": 108,
+      "negative": 540,
+      "suspect": 141,
+      "deaths": 10
+    },
+    {
+      "name": "Tabasco",
+      "positive": 278,
+      "negative": 533,
+      "suspect": 361,
+      "deaths": 28
+    },
+    {
+      "name": "Tamaulipas",
+      "positive": 117,
+      "negative": 711,
+      "suspect": 225,
+      "deaths": 5
+    },
+    {
+      "name": "Tlaxcala",
+      "positive": 72,
+      "negative": 429,
+      "suspect": 86,
+      "deaths": 4
+    },
+    {
+      "name": "Veracruz",
+      "positive": 124,
+      "negative": 920,
+      "suspect": 476,
+      "deaths": 8
+    },
+    {
+      "name": "Yucatán",
+      "positive": 172,
+      "negative": 641,
+      "suspect": 105,
+      "deaths": 10
+    },
+    {
+      "name": "Zacatecas",
+      "positive": 27,
+      "negative": 305,
+      "suspect": 47,
+      "deaths": 2
+    }
+  ]
+}
