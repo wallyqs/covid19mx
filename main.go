@@ -32,12 +32,12 @@ const (
 	// See: https://en.wikipedia.org/wiki/Attack_rate
 	//      https://es.wikipedia.org/wiki/Incidencia
 	//
-	attackRateURL = "https://covid19.sinave.gob.mx/MapaTasas.aspx/Grafica22"
+	attackRateURL = "https://covid19.sinave.gob.mx/Log.aspx/Grafica22"
 )
 
 const (
-	version     = "0.3.0"
-	releaseDate = "April 19th, 2020"
+	version     = "0.3.2"
+	releaseDate = "April 20th, 2020"
 )
 
 var (
