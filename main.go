@@ -428,6 +428,71 @@ func showCSV(sdata *SinaveData) {
 	}
 }
 
+func showMunicipalData(state string) error {
+	// Try to fetch by municipal data instead.
+	pCases, err := fetchMunicipalData(municipalURL, "Confirmados")
+	if err != nil {
+		return err
+	}
+	nCases, err := fetchMunicipalData(municipalURL, "Negativos")
+	if err != nil {
+		return err
+	}
+	sCases, err := fetchMunicipalData(municipalURL, "Sospechosos")
+	if err != nil {
+		return err
+	}
+	dCases, err := fetchMunicipalData(municipalURL, "Defunciones")
+	if err != nil {
+		return err
+	}
+	muns := make(map[string]Municipio)
+
+	// Collect positive, negative, suspect...
+	for k, v := range pCases {
+		muns[k] = Municipio{
+			PositiveCases: v,
+		}
+	}
+	for k, v := range nCases {
+		m := muns[k]
+		m.NegativeCases = v
+		muns[k] = m
+	}
+	for k, v := range sCases {
+		m := muns[k]
+		m.SuspectCases = v
+		muns[k] = m
+	}
+	for k, v := range dCases {
+		m := muns[k]
+		m.Deaths = v
+		muns[k] = m
+	}
+
+	var tpCases, tnCases, tsCases, tdCases int
+	fmt.Println("|-----------|-----------------|-----------------|-------------------|---------|-------------|")
+	fmt.Println("| Municipio | Casos Positivos | Casos Negativos | Casos Sospechosos | Decesos | Positividad |")
+	fmt.Println("|-----------|-----------------|-----------------|-------------------|---------|-------------|")
+	for s, m := range muns {
+		var positivity float64
+		if m.PositiveCases > 0 {
+			positivity = float64(m.PositiveCases) / float64(m.PositiveCases+m.NegativeCases)
+		}
+		tpCases += m.PositiveCases
+		tnCases += m.NegativeCases
+		tsCases += m.SuspectCases
+		tdCases += m.Deaths
+		fmt.Printf("| %-9s | %-15d | %-15d | %-17d | %-7d | %-11.4f |\n",
+			s, m.PositiveCases, m.NegativeCases, m.SuspectCases, m.Deaths, positivity)
+	}
+	fmt.Println("|-----------|-----------------|-----------------|-------------------|---------|-------------|")
+	fmt.Printf("| %-9s | %-15d | %-15d | %-17d | %-7d | %-11s |\n",
+		"TOTAL", tpCases, tnCases, tsCases, tdCases, "")
+	fmt.Println("|-----------|-----------------|-----------------|-------------------|---------|-------------|")
+	return nil
+}
+
 type CliConfig struct {
 	showVersion  bool
 	showHelp     bool
@@ -469,39 +534,11 @@ func main() {
 	}
 
 	if config.municipio != "" {
-		// Try to fetch by municipal data instead.
-		pCases, err := fetchMunicipalData(municipalURL, "Confirmados")
+		err := showMunicipalData(config.municipio)
 		if err != nil {
 			log.Fatal(err)
 		}
-		nCases, err := fetchMunicipalData(municipalURL, "Negativos")
-		if err != nil {
-			log.Fatal(err)
-		}
-		sCases, err := fetchMunicipalData(municipalURL, "Sospechosos")
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Println(len(pCases), len(nCases), len(sCases))
-		muns := make(map[string]Municipio)
-		for k, v := range pCases {
-			muns[k] = Municipio{
-				PositiveCases: v,
-			}
-		}
-		for k, v := range nCases {
-			m := muns[k]
-			m.NegativeCases = v
-			muns[k] = m
-		}
-		for k, v := range sCases {
-			m := muns[k]
-			m.SuspectCases = v
-			muns[k] = m
-		}
-		for s, m := range muns {
-			fmt.Println(s, m)
-		}
+		os.Exit(0)
 	}
 
 	var (
