@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -33,6 +34,10 @@ const (
 	//      https://es.wikipedia.org/wiki/Incidencia
 	//
 	attackRateURL = "https://covid19.sinave.gob.mx/Log.aspx/Grafica22"
+
+	// municipalURL is the url from where we can get the data at a
+	// municipal level.
+	municipalURL = "https://coronavirus.gob.mx/fHDMap/info/getInfoMun.php"
 )
 
 const (
@@ -49,6 +54,15 @@ func init() {
 }
 
 type State struct {
+	Name          string  `json:"name"`
+	PositiveCases int     `json:"positive"`
+	NegativeCases int     `json:"negative"`
+	SuspectCases  int     `json:"suspect"`
+	Deaths        int     `json:"deaths"`
+	AttackRate    float64 `json:"attack_rate"`
+}
+
+type Municipio struct {
 	Name          string  `json:"name"`
 	PositiveCases int     `json:"positive"`
 	NegativeCases int     `json:"negative"`
@@ -253,6 +267,65 @@ func detectLatestDataSource() (string, error) {
 	return "", ErrSourceNotFound
 }
 
+func fetchMunicipalData(endpoint string, caseType string) (map[string]int, error) {
+	vals := url.Values{"sPatType": {caseType}}
+	resp, err := http.PostForm(endpoint, vals)
+	if err != nil {
+		return nil, err
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("Error: %s", body)
+	}
+
+	muns, err := parseScript(string(body))
+	if err != nil {
+		return nil, err
+	}
+
+	return muns, nil
+}
+
+func parseScript(sample string) (map[string]int, error) {
+	muns := map[string]int{}
+	var (
+		start, end   int
+		vstart, vend int
+		mun          string
+	)
+	for i, c := range sample {
+		if start == 0 && c == 39 {
+			start = i + 1
+		} else if start > 0 && end == 0 && c == 39 {
+			end = i
+			mun = sample[start:end]
+			if mun == "body" {
+				break
+			}
+		} else if start > 0 && end > 0 && vstart == 0 && c == '=' {
+			vstart = i + 1
+		} else if start > 0 && end > 0 && vstart > 0 && vend == 0 && c == ';' {
+			vend = i
+			v, err := strconv.Atoi(sample[vstart:vend])
+			if err != nil {
+				return nil, err
+			}
+			muns[mun] = v
+
+			// Reset everything
+			start = 0
+			end = 0
+			vstart = 0
+			vend = 0
+		}
+	}
+
+	return muns, nil
+}
+
 func showTable(sdata *SinaveData) {
 	fmt.Println("|----------------------|-----------------|-----------------|-------------------|---------|-------------|------------|")
 	fmt.Println("| Estado               | Casos Positivos | Casos Negativos | Casos Sospechosos | Decesos | Positividad | Incidencia |")
@@ -361,6 +434,7 @@ type CliConfig struct {
 	exportFormat string
 	source       string
 	since        string
+	municipio    string
 }
 
 func main() {
@@ -380,6 +454,8 @@ func main() {
 	fs.StringVar(&config.exportFormat, "o", "", "Export format (options: json, csv, table)")
 	fs.StringVar(&config.source, "source", "", "Source of the data")
 	fs.StringVar(&config.since, "since", "", "Date against which to compare the data")
+	fs.StringVar(&config.municipio, "municipio", "", "Municipio used to narrow down data")
+	fs.StringVar(&config.municipio, "mun", "", "Municipio used to narrow down data")
 	fs.Parse(os.Args[1:])
 
 	switch {
@@ -390,6 +466,42 @@ func main() {
 		fmt.Printf("covid19mx v%s\n", version)
 		fmt.Printf("Release-Date %s\n", releaseDate)
 		os.Exit(0)
+	}
+
+	if config.municipio != "" {
+		// Try to fetch by municipal data instead.
+		pCases, err := fetchMunicipalData(municipalURL, "Confirmados")
+		if err != nil {
+			log.Fatal(err)
+		}
+		nCases, err := fetchMunicipalData(municipalURL, "Negativos")
+		if err != nil {
+			log.Fatal(err)
+		}
+		sCases, err := fetchMunicipalData(municipalURL, "Sospechosos")
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println(len(pCases), len(nCases), len(sCases))
+		muns := make(map[string]Municipio)
+		for k, v := range pCases {
+			muns[k] = Municipio{
+				PositiveCases: v,
+			}
+		}
+		for k, v := range nCases {
+			m := muns[k]
+			m.NegativeCases = v
+			muns[k] = m
+		}
+		for k, v := range sCases {
+			m := muns[k]
+			m.SuspectCases = v
+			muns[k] = m
+		}
+		for s, m := range muns {
+			fmt.Println(s, m)
+		}
 	}
 
 	var (
