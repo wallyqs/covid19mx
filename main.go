@@ -38,7 +38,7 @@ const (
 
 const (
 	version     = "0.4.0"
-	releaseDate = "April 21th, 2020"
+	releaseDate = "April 22th, 2020"
 
 	// municipalURL is the url from where we can get the data at a
 	// municipal level.
