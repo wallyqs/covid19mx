@@ -33,7 +33,7 @@ const (
 	// See: https://en.wikipedia.org/wiki/Attack_rate
 	//      https://es.wikipedia.org/wiki/Incidencia
 	//
-	attackRateURL = "https://covid19.sinave.gob.mx/Log.aspx/Grafica22"
+	attackRateURL = "https://covid19.sinave.gob.mx/Mapatasas.aspx/Grafica22"
 )
 
 const (
@@ -51,14 +51,14 @@ var (
 	// StatesMap maps the name of a state to an id.
 	StatesMap map[string]string = map[string]string{
 		"01": "Aguascalientes",
-		"02": "BajaCalifornia",
-		"03": "BajaCaliforniaSur",
+		"02": "Baja California",
+		"03": "Baja California Sur",
 		"04": "Campeche",
 		"05": "Coahuila",
 		"06": "Colima",
 		"07": "Chiapas",
 		"08": "Chihuahua",
-		"09": "CDMX",
+		"09": "Ciudad de México",
 		"10": "Durango",
 		"11": "Guanajuato",
 		"12": "Guerrero",
@@ -68,12 +68,12 @@ var (
 		"16": "Michoacán",
 		"17": "Morelos",
 		"18": "Nayarit",
-		"19": "NuevoLeón",
+		"19": "Nuevo León",
 		"20": "Oaxaca",
 		"21": "Puebla",
 		"22": "Queretaro",
-		"23": "QuintanaRoo",
-		"24": "SanLuisPotosí",
+		"23": "Quintana Roo",
+		"24": "San Luis Potosí",
 		"25": "Sinaloa",
 		"26": "Sonora",
 		"27": "Tabasco",
@@ -2930,7 +2930,9 @@ func showCSV(sdata *SinaveData) {
 	}
 }
 
-func showMunicipalData(state string) error {
+func showMunicipalData(config *CliConfig) error {
+	state := config.municipio
+
 	// Try to fetch by municipal data instead.
 	pCases, err := fetchMunicipalData(municipalURL, "Confirmados")
 	if err != nil {
@@ -2948,6 +2950,7 @@ func showMunicipalData(state string) error {
 	if err != nil {
 		return err
 	}
+	states := make(map[string]State)
 	muns := make(map[string]Municipio)
 
 	// Collect positive, negative, suspect...
@@ -2972,22 +2975,39 @@ func showMunicipalData(state string) error {
 		muns[k] = m
 	}
 
-	//
-
 	var tpCases, tnCases, tsCases, tdCases int
-	fmt.Println("|-------------------|-----------------|-----------------|-------------------|---------|-------------|---------------------------|")
-	fmt.Println("| Estado            | Casos Positivos | Casos Negativos | Casos Sospechosos | Decesos | Positividad | Nombre                    |")
-	fmt.Println("|-------------------|-----------------|-----------------|-------------------|---------|-------------|---------------------------|")
+
+	if config.exportFormat != "json" {
+		fmt.Println("|-------------------|-----------------|-----------------|-------------------|---------|-------------|---------------------------|")
+		fmt.Println("| Estado            | Casos Positivos | Casos Negativos | Casos Sospechosos | Decesos | Positividad | Nombre                    |")
+		fmt.Println("|-------------------|-----------------|-----------------|-------------------|---------|-------------|---------------------------|")
+	}
 	for s, m := range muns {
 		details := MunicipiosMexico[s]
 		filter := s[:2]
+		sName := StatesMap[filter]
+
+		stateName := strings.Join(strings.Fields(sName), "")
+		if s, ok := states[filter]; ok {
+			s.PositiveCases += m.PositiveCases
+			s.NegativeCases += m.NegativeCases
+			s.SuspectCases += m.SuspectCases
+			s.Deaths += m.Deaths
+			states[filter] = s
+		} else {
+			states[filter] = State{
+				Name:          StatesMap[filter],
+				PositiveCases: m.PositiveCases,
+				NegativeCases: m.NegativeCases,
+				SuspectCases:  m.SuspectCases,
+				Deaths:        m.Deaths,
+			}
+		}
 
 		// Skip match all filters but allow narrow down per state.
 		if state != "*" && state != "all" && state != filter {
 			continue
 		}
-
-		stateName := strings.Join(strings.Fields(StatesMap[filter]), "")
 
 		var positivity float64
 		if m.PositiveCases > 0 {
@@ -2997,14 +3017,47 @@ func showMunicipalData(state string) error {
 		tnCases += m.NegativeCases
 		tsCases += m.SuspectCases
 		tdCases += m.Deaths
-		fmt.Printf("| %-17s | %-15d | %-15d | %-17d | %-7d | %-11.4f | %s\n",
-			stateName, m.PositiveCases, m.NegativeCases, m.SuspectCases, m.Deaths, positivity, details.Name)
+		if config.exportFormat != "json" {
+			fmt.Printf("| %-17s | %-15d | %-15d | %-17d | %-7d | %-11.4f | %s\n",
+				stateName, m.PositiveCases, m.NegativeCases, m.SuspectCases, m.Deaths, positivity, details.Name)
+		}
 	}
 	totalPositivity := float64(tpCases) / float64(tpCases+tnCases)
-	fmt.Println("|-------------------|-----------------|-----------------|-------------------|---------|-------------|")
-	fmt.Printf("| %-17s | %-15d | %-15d | %-17d | %-7d | %-11.4f |\n",
-		"TOTAL", tpCases, tnCases, tsCases, tdCases, totalPositivity)
-	fmt.Println("|-------------------|-----------------|-----------------|-------------------|---------|-------------|")
+
+	if config.exportFormat != "json" {
+		fmt.Println("|-------------------|-----------------|-----------------|-------------------|---------|-------------|")
+		fmt.Printf("| %-17s | %-15d | %-15d | %-17d | %-7d | %-11.4f |\n",
+			"TOTAL", tpCases, tnCases, tsCases, tdCases, totalPositivity)
+		fmt.Println("|-------------------|-----------------|-----------------|-------------------|---------|-------------|")
+	}
+	sdata := &SinaveData{
+		States: make([]State, 0),
+	}
+	for _, v := range states {
+		sdata.States = append(sdata.States, v)
+	}
+	if config.municipio == "states" {
+		sdata2, err := fetchData(attackRateURL)
+		if err != nil {
+			return err
+		}
+		for i, s := range sdata.States {
+			for _, s2 := range sdata2.States {
+				if s2.Name == s.Name {
+					s.AttackRate = s2.AttackRate
+					sdata.States[i] = s
+				}
+
+			}
+		}
+
+		switch config.exportFormat {
+		case "json":
+			showJSON(sdata)
+		case "table":
+			showTable(sdata)
+		}
+	}
 	return nil
 }
 
@@ -3049,7 +3102,7 @@ func main() {
 	}
 
 	if config.municipio != "" {
-		err := showMunicipalData(config.municipio)
+		err := showMunicipalData(config)
 		if err != nil {
 			log.Fatal(err)
 		}
