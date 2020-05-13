@@ -2782,7 +2782,7 @@ func fetchMunicipalData(endpoint string, caseType string) (map[string]int, error
 	if resp.StatusCode != 200 {
 		return nil, fmt.Errorf("Error: %s", body)
 	}
-
+	fmt.Println(string(body))
 	muns, err := parseScript(string(body))
 	if err != nil {
 		return nil, err
@@ -2798,6 +2798,13 @@ func parseScript(sample string) (map[string]int, error) {
 		vstart, vend int
 		mun          string
 	)
+
+	reset := func(){
+		start = 0
+		end = 0
+		vstart = 0
+		vend = 0
+	}
 	for i, c := range sample {
 		if start == 0 && c == 39 {
 			start = i + 1
@@ -2811,17 +2818,21 @@ func parseScript(sample string) (map[string]int, error) {
 			vstart = i + 1
 		} else if start > 0 && end > 0 && vstart > 0 && vend == 0 && c == ';' {
 			vend = i
+			s := sample[vstart:vend]
+			if s == ` new Array()` {
+				reset()
+				continue
+			}
+			
 			v, err := strconv.Atoi(sample[vstart:vend])
 			if err != nil {
+				continue
 				return nil, err
 			}
 			muns[mun] = v
 
 			// Reset everything
-			start = 0
-			end = 0
-			vstart = 0
-			vend = 0
+			reset()
 		}
 	}
 
