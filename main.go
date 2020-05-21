@@ -2782,7 +2782,6 @@ func fetchMunicipalData(endpoint string, caseType string) (map[string]int, error
 	if resp.StatusCode != 200 {
 		return nil, fmt.Errorf("Error: %s", body)
 	}
-	fmt.Println(string(body))
 	muns, err := parseScript(string(body))
 	if err != nil {
 		return nil, err
