@@ -1,0 +1,260 @@
+{
+  "states": [
+    {
+      "name": "Tabasco",
+      "positive": 3236,
+      "negative": 3399,
+      "suspect": 800,
+      "deaths": 418,
+      "attack_rate": 23.55
+    },
+    {
+      "name": "Colima",
+      "positive": 115,
+      "negative": 396,
+      "suspect": 36,
+      "deaths": 16,
+      "attack_rate": 5.73
+    },
+    {
+      "name": "Michoacán",
+      "positive": 1402,
+      "negative": 3371,
+      "suspect": 731,
+      "deaths": 113,
+      "attack_rate": 7.21
+    },
+    {
+      "name": "Oaxaca",
+      "positive": 1070,
+      "negative": 1264,
+      "suspect": 376,
+      "deaths": 107,
+      "attack_rate": 9.7
+    },
+    {
+      "name": "Jalisco",
+      "positive": 1238,
+      "negative": 9037,
+      "suspect": 462,
+      "deaths": 115,
+      "attack_rate": 4.51
+    },
+    {
+      "name": "Hidalgo",
+      "positive": 1319,
+      "negative": 1363,
+      "suspect": 285,
+      "deaths": 202,
+      "attack_rate": 13.15
+    },
+    {
+      "name": "Aguascalientes",
+      "positive": 649,
+      "negative": 3298,
+      "suspect": 60,
+      "deaths": 25,
+      "attack_rate": 11.08
+    },
+    {
+      "name": "Tlaxcala",
+      "positive": 827,
+      "negative": 1661,
+      "suspect": 197,
+      "deaths": 129,
+      "attack_rate": 15.57
+    },
+    {
+      "name": "Tamaulipas",
+      "positive": 1288,
+      "negative": 4340,
+      "suspect": 1486,
+      "deaths": 80,
+      "attack_rate": 8.16
+    },
+    {
+      "name": "Chiapas",
+      "positive": 1222,
+      "negative": 1170,
+      "suspect": 265,
+      "deaths": 76,
+      "attack_rate": 8.6
+    },
+    {
+      "name": "Veracruz",
+      "positive": 2944,
+      "negative": 2961,
+      "suspect": 1060,
+      "deaths": 383,
+      "attack_rate": 7.02
+    },
+    {
+      "name": "Yucatán",
+      "positive": 1521,
+      "negative": 2496,
+      "suspect": 303,
+      "deaths": 121,
+      "attack_rate": 17.26
+    },
+    {
+      "name": "Campeche",
+      "positive": 443,
+      "negative": 637,
+      "suspect": 74,
+      "deaths": 48,
+      "attack_rate": 10.19
+    },
+    {
+      "name": "San Luis Potosí",
+      "positive": 692,
+      "negative": 3083,
+      "suspect": 169,
+      "deaths": 40,
+      "attack_rate": 7.46
+    },
+    {
+      "name": "Nayarit",
+      "positive": 439,
+      "negative": 941,
+      "suspect": 82,
+      "deaths": 40,
+      "attack_rate": 9.46
+    },
+    {
+      "name": "Durango",
+      "positive": 246,
+      "negative": 1436,
+      "suspect": 185,
+      "deaths": 26,
+      "attack_rate": 3.74
+    },
+    {
+      "name": "Quintana Roo",
+      "positive": 1638,
+      "negative": 1259,
+      "suspect": 151,
+      "deaths": 293,
+      "attack_rate": 13.57
+    },
+    {
+      "name": "Guerrero",
+      "positive": 1301,
+      "negative": 1508,
+      "suspect": 922,
+      "deaths": 182,
+      "attack_rate": 9.07
+    },
+    {
+      "name": "Morelos",
+      "positive": 1224,
+      "negative": 1166,
+      "suspect": 160,
+      "deaths": 238,
+      "attack_rate": 10.46
+    },
+    {
+      "name": "Baja California Sur",
+      "positive": 540,
+      "negative": 1299,
+      "suspect": 81,
+      "deaths": 32,
+      "attack_rate": 9.81
+    },
+    {
+      "name": "México",
+      "positive": 11523,
+      "negative": 14775,
+      "suspect": 6720,
+      "deaths": 1208,
+      "attack_rate": 8.15
+    },
+    {
+      "name": "Puebla",
+      "positive": 2165,
+      "negative": 3202,
+      "suspect": 1222,
+      "deaths": 261,
+      "attack_rate": 8.05
+    },
+    {
+      "name": "Sonora",
+      "positive": 1450,
+      "negative": 2227,
+      "suspect": 1077,
+      "deaths": 84,
+      "attack_rate": 11.7
+    },
+    {
+      "name": "Coahuila",
+      "positive": 876,
+      "negative": 5298,
+      "suspect": 1609,
+      "deaths": 68,
+      "attack_rate": 4.72
+    },
+    {
+      "name": "Ciudad de México",
+      "positive": 20234,
+      "negative": 25790,
+      "suspect": 5635,
+      "deaths": 1710,
+      "attack_rate": 40.51
+    },
+    {
+      "name": "Chihuahua",
+      "positive": 1193,
+      "negative": 1547,
+      "suspect": 1189,
+      "deaths": 254,
+      "attack_rate": 2.49
+    },
+    {
+      "name": "Sinaloa",
+      "positive": 2794,
+      "negative": 2902,
+      "suspect": 479,
+      "deaths": 402,
+      "attack_rate": 17.64
+    },
+    {
+      "name": "Guanajuato",
+      "positive": 1127,
+      "negative": 9302,
+      "suspect": 464,
+      "deaths": 92,
+      "attack_rate": 5.94
+    },
+    {
+      "name": "Queretaro",
+      "positive": 710,
+      "negative": 1326,
+      "suspect": 192,
+      "deaths": 70,
+      "attack_rate": 11.44
+    },
+    {
+      "name": "Zacatecas",
+      "positive": 243,
+      "negative": 1142,
+      "suspect": 37,
+      "deaths": 28,
+      "attack_rate": 3.24
+    },
+    {
+      "name": "Nuevo León",
+      "positive": 1168,
+      "negative": 8902,
+      "suspect": 2075,
+      "deaths": 68,
+      "attack_rate": 5.36
+    },
+    {
+      "name": "Baja California",
+      "positive": 4246,
+      "negative": 2528,
+      "suspect": 915,
+      "deaths": 703,
+      "attack_rate": 15.21
+    }
+  ]
+}
